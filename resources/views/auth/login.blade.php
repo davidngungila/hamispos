@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="{{ asset('logo-image-feedtan-store.png') }}">
-    <title>Login - FEEDTAN STORE</title>
+    <title>Login - BAHARI COMPANY</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -55,8 +55,8 @@
                 <div class="w-20 h-20 mx-auto bg-white/20 rounded-2xl flex items-center justify-center mb-4">
                     <i class="fa-solid fa-leaf text-4xl text-white"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-white">FEEDTAN STORE</h1>
-                <p class="text-primary-100 text-sm mt-1">Sign in to your account</p>
+                <h1 class="text-2xl font-bold text-white">BAHARI COMPANY</h1>
+                <p class="text-primary-100 text-sm mt-1">Sign in to BAHARI COMPANY</p>
             </div>
 
             <!-- Form -->
