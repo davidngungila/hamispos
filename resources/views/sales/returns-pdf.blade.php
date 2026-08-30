@@ -178,7 +178,7 @@
 
       <div class="container">
           <div class="header">
-              <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('feedtanstorelogo.png'))) }}" alt="FEEDTAN STORE" style="max-width: 150px; margin: 0 auto 8px auto;">
+              <div style="font-size: 22px; font-weight: 800; color: #111;">BAHARI COMPANY</div>
               <div class="sub-header" style="font-size: 10px; margin-top: 4px;">Inventory & Sales Management System</div>
               <div class="receipt-title">OFFICIAL RETURN RECEIPT</div>
           </div>
@@ -282,10 +282,10 @@
           </table>
 
           <div class="footer">
-             <strong>FEEDTAN STORE INVENTORY SYSTEM</strong><br>
-             Powered by FeedTan Team<br>
+             <strong>BAHARI COMPANY INVENTORY SYSTEM</strong><br>
+             Powered by BAHARI COMPANY<br>
              <div style="margin-top: 10px; font-size: 8px; color: #9ca3af;">
-                 This document is electronically generated and verified by FEEDTAN STORE INVENTORY SYSTEM.
+                 This document is electronically generated and verified by BAHARI COMPANY INVENTORY SYSTEM.
              </div>
          </div>
       </div>

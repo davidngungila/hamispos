@@ -72,6 +72,7 @@
                 
                 <form id="saleForm" action="{{ route('sales.store') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="type" value="cash">
                     
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Customer</label>

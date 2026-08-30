@@ -176,7 +176,10 @@
 <body>
     <div class="receipt">
         <div class="header">
-            <img src="{{ asset('feedtanstorelogo.png') }}" alt="FEEDTAN STORE" style="max-width: 150px; margin: 0 auto 8px auto; filter: grayscale(100%) brightness(0);">
+            <h1>BAHARI COMPANY</h1>
+            <p>Dar es Salaam, Tanzania</p>
+            <p>TIN: 000-000-000</p>
+            <p>Tel: +255 000 000 000</p>
         </div>
         
         <div class="details">
