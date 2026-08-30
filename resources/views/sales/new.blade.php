@@ -155,6 +155,26 @@
 <!-- Include QR Scanner library -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
+<!-- Success Modal -->
+<div id="saleSuccessModal" class="fixed inset-0 z-[999] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 text-center animate-[fadeIn_0.3s_ease]">
+        <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-5">
+            <i class="fa-solid fa-circle-check text-5xl text-green-600"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-primary-900 mb-2">Sale Completed Successfully!</h2>
+        <p class="text-gray-500 text-sm mb-2">Invoice: <span id="successInvoice" class="font-semibold text-primary-700">#</span></p>
+        <p class="text-gray-500 text-sm mb-6">Total: <span id="successTotal" class="font-semibold text-primary-700">TZS 0.00</span></p>
+        <div class="flex flex-col gap-3">
+            <button onclick="printReceipt()" class="w-full bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-print"></i>Print Receipt
+            </button>
+            <button onclick="closeSuccessModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 let cart = [];
 let originalPaidAmount = 0;
@@ -494,22 +514,89 @@ window.addToCart = function(productId, productName, price) {
     }
 };
 
+let lastReceiptUrl = null;
+
 // Send payment info when sale is submitted
 document.getElementById('saleForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
     const total = lastCalculatedTotal;
     const paid = parseFloat(document.getElementById('paidAmount').value);
     const change = Math.max(0, paid - total);
     const paymentMethod = document.getElementById('paymentMethod').value;
-    
-    await sendToVFD('payment', {
-        total: total,
-        paid: paid,
-        change: change,
-        payment_method: paymentMethod
-    });
-    
-    await sendToVFD('thank-you');
+
+    try {
+        await sendToVFD('payment', {
+            total: total,
+            paid: paid,
+            change: change,
+            payment_method: paymentMethod
+        });
+        await sendToVFD('thank-you');
+    } catch (err) {
+        console.error('VFD error:', err);
+    }
+
+    const form = this;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok && data.success) {
+            lastReceiptUrl = data.receipt_url || data.redirect || '#';
+            document.getElementById('successInvoice').textContent = data.invoice_number || '#';
+            document.getElementById('successTotal').textContent = 'TZS ' + (data.total || 0).toFixed(2);
+            showSuccessModal();
+        } else {
+            const message = data.message || 'There was an error completing the sale.';
+            alert(message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An unexpected error occurred. Please try again.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
 });
+
+function showSuccessModal() {
+    const modal = document.getElementById('saleSuccessModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('saleSuccessModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    window.location.href = @json(route('sales.new'));
+}
+
+function printReceipt() {
+    if (lastReceiptUrl && lastReceiptUrl !== '#') {
+        const printWindow = window.open(lastReceiptUrl, '_blank');
+        if (printWindow) {
+            printWindow.onload = function() {
+                printWindow.focus();
+                printWindow.print();
+            };
+        }
+    }
+}
 
 // Send welcome message when page loads
 document.addEventListener('DOMContentLoaded', function() {
