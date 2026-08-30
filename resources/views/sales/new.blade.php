@@ -175,6 +175,9 @@
     </div>
 </div>
 
+<!-- Hidden iframe for in-page receipt printing -->
+<iframe id="receiptPrintFrame" style="position:fixed; left:-10000px; top:0; width:350px; height:0; border:0; visibility:hidden;"></iframe>
+
 <script>
 let cart = [];
 let originalPaidAmount = 0;
@@ -515,7 +518,6 @@ window.addToCart = function(productId, productName, price) {
 };
 
 let lastReceiptUrl = null;
-let printWindowRef = null;
 
 // Send payment info when sale is submitted
 document.getElementById('saleForm').addEventListener('submit', async function(e) {
@@ -525,9 +527,6 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
     const paid = parseFloat(document.getElementById('paidAmount').value);
     const change = Math.max(0, paid - total);
     const paymentMethod = document.getElementById('paymentMethod').value;
-
-    // Pre-open the print window as part of the trusted click so browsers don't block it
-    printWindowRef = window.open('', '_blank');
 
     try {
         await sendToVFD('payment', {
@@ -564,17 +563,7 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
             document.getElementById('successInvoice').textContent = data.invoice_number || '#';
             document.getElementById('successTotal').textContent = 'TZS ' + (data.total || 0).toFixed(2);
             showSuccessModal();
-            if (printWindowRef) {
-                printWindowRef.location.href = lastReceiptUrl;
-                printWindowRef.onload = function() {
-                    try {
-                        printWindowRef.focus();
-                        printWindowRef.print();
-                    } catch (err) {
-                        console.error('Auto print failed:', err);
-                    }
-                };
-            }
+            printReceipt();
         } else {
             const message = data.message || 'There was an error completing the sale.';
             alert(message);
@@ -603,15 +592,19 @@ function closeSuccessModal() {
 
 function printReceipt() {
     if (lastReceiptUrl && lastReceiptUrl !== '#') {
-        const printWindow = window.open(lastReceiptUrl, '_blank');
-        if (printWindow) {
-            printWindow.onload = function() {
-                printWindow.focus();
-                printWindow.print();
-            };
-        } else {
-            alert('Please allow popups to print the receipt automatically.');
-        }
+        const frame = document.getElementById('receiptPrintFrame');
+        frame.onload = function() {
+            try {
+                frame.contentWindow.focus();
+                frame.contentWindow.print();
+            } catch (err) {
+                console.error('Print failed:', err);
+                alert('Please use the browser print option (Ctrl+P) to print the receipt.');
+            }
+        };
+        frame.src = lastReceiptUrl;
+        frame.style.height = 'auto';
+        frame.style.visibility = 'visible';
     }
 }
 
