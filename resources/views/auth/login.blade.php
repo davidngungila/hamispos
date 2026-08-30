@@ -44,7 +44,7 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body class="h-full bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950">
+<body class="h-full bg-white">
     <div class="h-full flex items-center justify-center p-4">
         <div 
             x-data="{ loading: false }"
