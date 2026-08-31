@@ -51,12 +51,8 @@
             class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-[fadeIn_0.5s_ease]"
         >
             <!-- Header -->
-            <div class="bg-gradient-to-r from-primary-600 to-primary-800 p-8 text-center">
-                <div class="w-20 h-20 mx-auto bg-white/20 rounded-2xl flex items-center justify-center mb-4">
-                    <i class="fa-solid fa-leaf text-4xl text-white"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-white">BAHARI COMPANY</h1>
-                <p class="text-primary-100 text-sm mt-1">Sign in to BAHARI COMPANY</p>
+            <div class="p-8 text-center">
+                <img src="{{ asset('feedtanstorelogo.png') }}" alt="BAHARI COMPANY" class="mx-auto h-24 object-contain">
             </div>
 
             <!-- Form -->

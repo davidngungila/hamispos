@@ -279,14 +279,15 @@
            class="sidebar-bg">
 
     <!-- Sidebar Header -->
-    <div class="flex items-center justify-between p-4 border-b border-white/20 flex-shrink-0">
-      <div class="flex items-center gap-3" x-show="!sidebarCollapsed || window.innerWidth<1024">
-        <img src="{{ asset('feedtanstorelogo.png') }}" alt="FEEDTAN STORE" class="w-full h-12 rounded-lg flex-shrink-0 object-contain" style="max-width: 180px; filter: brightness(0) invert(1);">
-      </div>
-      <div x-show="sidebarCollapsed && window.innerWidth>=1024" class="w-10 h-10 rounded-lg flex items-center justify-center mx-auto">
-        <img src="{{ asset('feedtanstorelogo.png') }}" alt="FEEDTAN STORE" class="w-full h-full rounded-lg object-contain" style="filter: brightness(0) invert(1);">
-      </div>
-      <button @click="sidebarCollapsed=!sidebarCollapsed" class="text-primary-300 hover:text-white transition-colors hidden lg:block">
+    <div class="relative flex items-center justify-center p-4 border-b border-white/20 flex-shrink-0">
+      <img x-show="!sidebarCollapsed || window.innerWidth<1024"
+           src="{{ asset('feedtanstorelogo.png') }}" alt="BAHARI COMPANY"
+           class="h-12 rounded-lg object-contain transition-all duration-300"
+           style="max-width: 180px;">
+      <img x-show="sidebarCollapsed && window.innerWidth>=1024"
+           src="{{ asset('feedtanstorelogo.png') }}" alt="BAHARI COMPANY"
+           class="w-10 h-10 rounded-lg object-contain">
+      <button @click="sidebarCollapsed=!sidebarCollapsed" class="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 hover:text-white transition-colors hidden lg:block">
         <i :class="sidebarCollapsed?'fa-solid fa-chevron-right':'fa-solid fa-chevron-left'" class="text-xs"></i>
       </button>
     </div>
@@ -1366,7 +1367,7 @@
         <!-- Cashier Navbar -->
         <div class="w-full flex items-center justify-between sidebar-bg text-white px-4 py-3">
           <div class="flex items-center gap-4">
-            <img src="{{ asset('feedtanstorelogo.png') }}" alt="FEEDTAN STORE" class="h-10 object-contain" style="filter: brightness(0) invert(1);">
+            <img src="{{ asset('feedtanstorelogo.png') }}" alt="BAHARI COMPANY" class="h-10 object-contain">
           </div>
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2 text-sm">
