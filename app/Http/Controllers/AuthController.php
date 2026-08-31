@@ -17,10 +17,18 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
+        $validated = $request->validate([
+            'login' => ['required', 'string'],
             'password' => ['required'],
         ]);
+
+        // Allow users to sign in with either their username or email address.
+        $identifier = $validated['login'];
+        $field = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $credentials = [
+            $field => $identifier,
+            'password' => $validated['password'],
+        ];
 
         $deviceName = $request->header('User-Agent');
         $deviceType = $this->getDeviceType($deviceName);
@@ -76,15 +84,15 @@ class AuthController extends Controller
         // Record failed login
         LoginHistory::create([
             'user_id' => null,
-            'email' => $credentials['email'],
+            'email' => $identifier,
             'success' => false,
             'ip_address' => $ipAddress,
             'user_agent' => $userAgent,
         ]);
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+            'login' => 'The provided credentials do not match our records.',
+        ])->onlyInput('login');
     }
 
     public function logout(Request $request)

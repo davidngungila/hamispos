@@ -13,10 +13,11 @@ class CashierUserSeeder extends Seeder
     public function run(): void
     {
         \App\Models\User::firstOrCreate(
-            ['email' => 'cashier@feedtan.com'],
+            ['email' => 'cashier@baharitz.com'],
             [
-                'name' => 'Feedtan Cashier',
-                'email' => 'cashier@feedtan.com',
+                'name' => 'Bahari Cashier',
+                'username' => 'cashier',
+                'email' => 'cashier@baharitz.com',
                 'password' => bcrypt('password'),
                 'role' => 'cashier'
             ]

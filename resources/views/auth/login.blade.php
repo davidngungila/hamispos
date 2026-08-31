@@ -68,24 +68,25 @@
                 >
                     @csrf
 
-                    <!-- Email -->
+                    <!-- Username / Email -->
                     <div class="mb-6">
-                        <label class="block text-sm font-semibold text-primary-900 mb-2">Email Address</label>
+                        <label class="block text-sm font-semibold text-primary-900 mb-2">Username or Email</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-primary-400">
-                                <i class="fa-solid fa-envelope"></i>
+                                <i class="fa-solid fa-user"></i>
                             </span>
                             <input 
-                                type="email" 
-                                name="email" 
-                                value="{{ old('email') }}"
+                                type="text" 
+                                name="login" 
+                                value="{{ old('login') }}"
                                 required 
                                 autofocus
+                                autocomplete="username"
                                 class="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-primary-100 bg-primary-50 text-primary-900 placeholder-primary-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all"
-                                placeholder="you@example.com"
+                                placeholder="username or you@baharitz.com"
                             >
                         </div>
-                        @error('email')
+                        @error('login')
                             <p class="text-red-500 text-xs mt-2 flex items-center gap-1">
                                 <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
                             </p>
