@@ -282,11 +282,11 @@
     <div class="relative flex items-center justify-center p-4 border-b border-white/20 flex-shrink-0">
       <img x-show="!sidebarCollapsed || window.innerWidth<1024"
            src="{{ asset('feedtanstorelogo.png') }}" alt="BAHARI COMPANY"
-           class="h-12 rounded-lg object-contain transition-all duration-300"
-           style="max-width: 180px;">
+           class="h-16 rounded-lg object-contain transition-all duration-300"
+           style="max-width: 220px;">
       <img x-show="sidebarCollapsed && window.innerWidth>=1024"
            src="{{ asset('feedtanstorelogo.png') }}" alt="BAHARI COMPANY"
-           class="w-10 h-10 rounded-lg object-contain">
+           class="w-12 h-12 rounded-lg object-contain">
       <button @click="sidebarCollapsed=!sidebarCollapsed" class="absolute right-4 top-1/2 -translate-y-1/2 text-primary-300 hover:text-white transition-colors hidden lg:block">
         <i :class="sidebarCollapsed?'fa-solid fa-chevron-right':'fa-solid fa-chevron-left'" class="text-xs"></i>
       </button>
