@@ -6,9 +6,9 @@ use App\Models\SaleReturn;
 use App\Models\SaleReturnItem;
 use App\Models\Sale;
 use App\Models\Product;
+use App\Support\DompdfHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Dompdf\Dompdf;
 
 class SaleReturnController extends Controller {
     public function index() {
@@ -39,7 +39,7 @@ class SaleReturnController extends Controller {
             'currency' => 'TZS',
         ];
         
-        $pdf = new Dompdf();
+        $pdf = DompdfHelper::create();
         $pdf->loadHtml(view('sales.returns-pdf', compact('return', 'paymentData'))->render());
         $pdf->setPaper('A4', 'portrait');
         $pdf->render();

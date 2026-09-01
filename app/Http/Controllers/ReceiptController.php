@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sale;
-use Dompdf\Dompdf;
+use App\Support\DompdfHelper;
 use Illuminate\Http\Request;
 
 class ReceiptController extends Controller {
@@ -34,7 +34,7 @@ class ReceiptController extends Controller {
         $qrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrCodeSvg);
 
         // Instantiate and use the dompdf class
-        $dompdf = new Dompdf();
+        $dompdf = DompdfHelper::create();
         $html = view('sales.receipt-pdf', compact('sale', 'qrCodeBase64'))->render();
         $dompdf->loadHtml($html);
 

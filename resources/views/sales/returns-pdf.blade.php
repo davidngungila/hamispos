@@ -4,8 +4,9 @@
      <meta charset="utf-8">
      <title>Return Receipt - {{ $return->return_number ?? 'N/A' }}</title>
      <style>
+          @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
           body {
-              font-family: 'Helvetica', 'Arial', sans-serif;
+              font-family: 'Manrope', 'Helvetica', 'Arial', sans-serif;
               color: #333;
               line-height: 1.4;
               margin: 0;
