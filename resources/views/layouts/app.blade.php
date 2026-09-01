@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('logo-image-feedtan-store.png') }}" />
+    <link rel="manifest" href="{{ asset('manifest.json') }}" />
+    <meta name="theme-color" content="#059669" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Bahari" />
+    <link rel="apple-touch-icon" href="{{ asset('logo-image-feedtan-store.png') }}" />
     <title>BAHARI COMPANY – Store Management System</title>
 
     <!-- Tailwind CSS -->
@@ -1443,9 +1449,31 @@
       }
     };
     
-    checkAlpine();
+checkAlpine();
   });
 </script>
-@yield('scripts')
+
+  <!-- Service Worker Registration for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('{{ asset('sw.js') }}')
+          .then(reg => {
+            console.log('Service Worker registered:', reg.scope);
+            // Check for updates
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New version available - optionally notify user
+                  console.log('New version available');
+                }
+              });
+            });
+          })
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
