@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('logo-image-feedtan-store.png') }}" />
-    <title>FEEDTAN STORE – Store Management System</title>
+    <title>BAHARI COMPANY – Store Management System</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1214,7 +1214,7 @@
               <i class="fa-solid fa-bars text-sm"></i>
             </button>
             <div class="hidden sm:flex items-center gap-2">
-              <span class="text-xs font-medium text-primary-500">FEEDTAN STORE</span>
+              <span class="text-xs font-medium text-primary-500">Bahari Company</span>
               <i class="fa-solid fa-chevron-right text-[10px] text-primary-300"></i>
               <span class="text-xs font-semibold text-primary-800">@yield('page-title')</span>
             </div>
