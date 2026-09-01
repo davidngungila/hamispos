@@ -59,7 +59,7 @@
                             </button>
                             <span id="scannerStatus" class="text-sm text-gray-500">Camera scanner is off.</span>
                         </div>
-                        <video id="qrScanner" class="w-full rounded-lg border border-gray-300" playsinline></video>
+                        <div id="qrScanner" class="relative w-full rounded-lg border border-gray-300 bg-black overflow-hidden" style="min-height:240px"></div>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Or enter barcode/SKU manually:</label>
