@@ -12,7 +12,7 @@
                 <div class="mb-6">
                     <div class="flex gap-4 mb-4 border-b border-gray-200">
                         <button id="manualModeBtn" class="px-6 py-2 text-primary-600 border-b-2 border-primary-600 font-semibold">Manual Mode</button>
-                        <button id="automaticModeBtn" class="px-6 py-2 text-gray-500 hover:text-primary-600">Automatic (QR Scan)</button>
+                        <button id="automaticModeBtn" class="px-6 py-2 text-gray-500 hover:text-primary-600">Camera Scan</button>
                     </div>
                 </div>
 
@@ -50,6 +50,15 @@
                 <div id="automaticModeContent" class="hidden">
                     <h2 class="text-xl font-bold text-primary-900 mb-4">Scan Barcodes</h2>
                     <div class="mb-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <button type="button" id="startSaleScannerBtn" onclick="startScanner()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium">
+                                <i class="fas fa-camera mr-1"></i>Start Camera
+                            </button>
+                            <button type="button" id="stopSaleScannerBtn" onclick="stopScanner()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium hidden">
+                                <i class="fas fa-stop-circle mr-1"></i>Stop Camera
+                            </button>
+                            <span id="scannerStatus" class="text-sm text-gray-500">Camera scanner is off.</span>
+                        </div>
                         <video id="qrScanner" class="w-full rounded-lg border border-gray-300" playsinline></video>
                     </div>
                     <div class="mb-4">
@@ -184,6 +193,9 @@ let originalPaidAmount = 0;
 let lastCalculatedTotal = 0;
 let currentDiscount = null;
 let html5QrCodeScanner = null;
+let scannerActive = false;
+let lastScannedCode = '';
+let lastScanAt = 0;
 let barcodeBuffer = '';
 let lastKeyTime = 0;
 
@@ -212,33 +224,132 @@ document.getElementById('automaticModeBtn').addEventListener('click', function()
 });
 
 // QR Scanner functions
-function startScanner() {
-    if (!html5QrCodeScanner) {
-        html5QrCodeScanner = new Html5QrcodeScanner(
-            "qrScanner",
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            false
+function updateScannerStatus(message, tone = 'muted') {
+    const status = document.getElementById('scannerStatus');
+    if (!status) return;
+    status.textContent = message;
+    status.classList.remove('text-gray-500', 'text-green-600', 'text-red-600', 'text-blue-600');
+    status.classList.add(
+        tone === 'success' ? 'text-green-600' :
+        tone === 'error' ? 'text-red-600' :
+        tone === 'info' ? 'text-blue-600' :
+        'text-gray-500'
+    );
+}
+
+async function startScanner() {
+    if (scannerActive) return;
+    if (typeof Html5Qrcode === 'undefined') {
+        updateScannerStatus('Camera scanner library failed to load.', 'error');
+        return;
+    }
+
+    const startBtn = document.getElementById('startSaleScannerBtn');
+    const stopBtn = document.getElementById('stopSaleScannerBtn');
+    if (startBtn) startBtn.classList.add('hidden');
+    if (stopBtn) stopBtn.classList.remove('hidden');
+    updateScannerStatus('Starting camera scanner...', 'info');
+
+    try {
+        html5QrCodeScanner = new Html5Qrcode('qrScanner');
+        const cameras = await Html5Qrcode.getCameras();
+        const backCamera = cameras.find(camera => /back|rear|environment/i.test(camera.label));
+        const cameraConfig = backCamera ? { deviceId: { exact: backCamera.id } } : { facingMode: 'environment' };
+
+        await html5QrCodeScanner.start(
+            cameraConfig,
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 160 },
+                aspectRatio: 1.5,
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.CODE_128,
+                    Html5QrcodeSupportedFormats.CODE_39,
+                    Html5QrcodeSupportedFormats.CODE_93,
+                    Html5QrcodeSupportedFormats.EAN_13,
+                    Html5QrcodeSupportedFormats.EAN_8,
+                    Html5QrcodeSupportedFormats.UPC_A,
+                    Html5QrcodeSupportedFormats.UPC_E,
+                    Html5QrcodeSupportedFormats.QR_CODE
+                ]
+            },
+            onScanSuccess,
+            () => {}
         );
-        html5QrCodeScanner.render(onScanSuccess, onScanFailure);
+
+        scannerActive = true;
+        updateScannerStatus('Camera scanner is live. Point it at a product barcode.', 'success');
+    } catch (error) {
+        console.error('Failed to start camera scanner', error);
+        scannerActive = false;
+        updateScannerStatus('Unable to start camera scanner. Check camera permission.', 'error');
+        stopScanner();
     }
 }
 
-function stopScanner() {
-    if (html5QrCodeScanner) {
-        html5QrCodeScanner.clear().catch(error => {
-            console.error("Failed to clear scanner", error);
-        });
+async function stopScanner(message = 'Camera scanner is off.') {
+    const startBtn = document.getElementById('startSaleScannerBtn');
+    const stopBtn = document.getElementById('stopSaleScannerBtn');
+
+    try {
+        if (html5QrCodeScanner) {
+            if (scannerActive) {
+                await html5QrCodeScanner.stop();
+            }
+            await html5QrCodeScanner.clear();
+        }
+    } catch (error) {
+        console.error('Failed to stop camera scanner', error);
+    } finally {
         html5QrCodeScanner = null;
+        scannerActive = false;
+        if (startBtn) startBtn.classList.remove('hidden');
+        if (stopBtn) stopBtn.classList.add('hidden');
+        updateScannerStatus(message, message === 'Camera scanner is off.' ? 'muted' : 'success');
     }
 }
 
 function onScanSuccess(decodedText) {
-    console.log(`Scanned: ${decodedText}`);
-    findProductByCode(decodedText);
+    const normalized = String(decodedText || '').trim();
+    if (!normalized) return;
+
+    const now = Date.now();
+    if (lastScannedCode === normalized && (now - lastScanAt) < 1500) {
+        return;
+    }
+
+    lastScannedCode = normalized;
+    lastScanAt = now;
+    console.log(`Scanned: ${normalized}`);
+    const added = findProductByCode(normalized, { fromCamera: true });
+    if (added) {
+        playScanBeep();
+        if (scannerActive) {
+            updateScannerStatus(`Scanned: ${normalized} -> added. Point at next barcode to keep scanning.`, 'success');
+        }
+    }
 }
 
-function onScanFailure(error) {
-    // Ignore scan failures - they're normal when no QR code is in view
+// Short beep for each camera scan
+function playScanBeep() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.25);
+    } catch (e) {
+        console.log('Scan beep not supported or blocked:', e);
+    }
 }
 
 function handleManualBarcodeKeydown(event) {
@@ -258,18 +369,30 @@ function addProductByBarcode() {
     }
 }
 
-function findProductByCode(code) {
+function findProductByCode(code, options = {}) {
+    const normalized = String(code || '').trim();
+    if (!normalized) return false;
+
     // Search by barcode, then by SKU
-    const product = productsData.find(p => p.barcode === code || p.sku === code);
+    const product = productsData.find(p => p.barcode === normalized || p.sku === normalized);
     if (product) {
         if (product.quantity > 0) {
             addToCart(product.id, product.name, product.selling_price);
             addToScannedList(product.name);
+            updateScannerStatus(
+                options.fromCamera
+                    ? `Added ${product.name}. Point at next barcode to keep scanning.`
+                    : `Added ${product.name} from scan.`,
+                'success'
+            );
+            return true;
         } else {
-            alert(`Product "${product.name}" is out of stock!`);
+            updateScannerStatus(`${product.name} is out of stock!`, 'error');
+            return false;
         }
     } else {
-        alert(`No product found with barcode/SKU: ${code}`);
+        updateScannerStatus(`No product found with barcode/SKU: ${normalized}`, 'error');
+        return false;
     }
 }
 
@@ -522,6 +645,7 @@ let lastReceiptUrl = null;
 // Send payment info when sale is submitted
 document.getElementById('saleForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    stopScanner('Camera scanner stopped for sale.');
 
     const total = lastCalculatedTotal;
     const paid = parseFloat(document.getElementById('paidAmount').value);
@@ -611,6 +735,11 @@ function printReceipt() {
 // Send welcome message when page loads
 document.addEventListener('DOMContentLoaded', function() {
     sendToVFD('welcome');
+});
+
+// Release the camera when leaving the page
+window.addEventListener('beforeunload', function() {
+    stopScanner();
 });
 </script>
 @endsection
