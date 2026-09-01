@@ -12,7 +12,7 @@
                 <div class="mb-6">
                     <div class="flex gap-4 mb-4 border-b border-gray-200">
                         <button id="manualModeBtn" class="px-6 py-2 text-primary-600 border-b-2 border-primary-600 font-semibold">Manual Mode</button>
-                        <button id="automaticModeBtn" class="px-6 py-2 text-gray-500 hover:text-primary-600">Camera Scan</button>
+                        <button id="automaticModeBtn" class="px-6 py-2 text-gray-500 hover:text-primary-600">Automatic (QR Scan)</button>
                     </div>
                 </div>
 
