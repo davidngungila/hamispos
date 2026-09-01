@@ -40,12 +40,14 @@
             color: #000000;
             margin-bottom: 4px;
             letter-spacing: 1px;
+            white-space: nowrap;
         }
         
         .header p {
             color: #000000;
             font-size: 12px;
             font-weight: 500;
+            white-space: nowrap;
         }
         
         .details {
